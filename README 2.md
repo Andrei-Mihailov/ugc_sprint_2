@@ -1,6 +1,6 @@
 # Проектная работа 8 спринта
 
-Ссылка на репозиторий - [ugc_sprint_1] (https://github.com/Andrei-Mihailov/ugc_sprint_1.git)
+Ссылка на репозиторий - [ugc_sprint_2] (https://github.com/Andrei-Mihailov/ugc_sprint_2.git)
 
 # Описание основных сервисов
 
