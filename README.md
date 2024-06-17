@@ -1,4 +1,4 @@
-# Проектная работа 8 спринта
+# Проектная работа 9 спринта
 
 Ссылка на репозиторий - [ugc_sprint_2] (https://github.com/Andrei-Mihailov/ugc_sprint_2.git)
 
