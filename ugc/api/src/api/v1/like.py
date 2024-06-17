@@ -13,6 +13,7 @@ db.create_all()
 
 
 @ugc_blueprint.route("/api/v1/<movie_id>/like", methods=["GET", "POST"])
+@jwt_required
 def add_like(movie_id):
     user_id = get_jwt_identity()
     like = Like.query.filter_by(movie_id=movie_id, user_id=user_id).first()
@@ -27,6 +28,7 @@ def add_like(movie_id):
 
 
 @ugc_blueprint.route("/api/v1/<movie_id>/dislike", methods=["GET", "POST"])
+@jwt_required
 def add_dislike(movie_id):
     user_id = get_jwt_identity()
     like = Like.query.filter_by(movie_id=movie_id, user_id=user_id).first()

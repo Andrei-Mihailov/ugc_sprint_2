@@ -12,6 +12,7 @@ db.create_all()
 
 
 @ugc_blueprint.route("/api/v1/<movie_id>/review", methods=["GET", "POST"])
+@jwt_required
 def add_review(movie_id):
     user_id = get_jwt_identity()
     review = request.get_json()
@@ -22,12 +23,14 @@ def add_review(movie_id):
 
 
 @ugc_blueprint.route("/api/v1/<movie_id>/review", methods=["GET", "POST"])
+@jwt_required
 def retrieve_reviews(movie_id):
     reviews = Review.query.filter_by(movie_id=movie_id).all()
     return jsonify([review.to_dict() for review in reviews]), 200
 
 
 @ugc_blueprint.route("/api/v1/<movie_id>/review", methods=["GET", "POST"])
+@jwt_required
 def delete_review(movie_id):
     user_id = get_jwt_identity()
     review = request.get_json()
