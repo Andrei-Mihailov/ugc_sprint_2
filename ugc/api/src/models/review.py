@@ -1,4 +1,6 @@
-from ugc.api.src.main import db
+from main import db
+
+
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     movie_id = db.Column(db.String(128), nullable=False)

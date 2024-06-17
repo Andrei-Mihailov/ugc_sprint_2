@@ -3,9 +3,9 @@ import datetime
 import concurrent.futures
 from tqdm import tqdm
 
-client = Client('localhost')
+client = Client("localhost")
 
-create_table_query = '''
+create_table_query = """
     CREATE TABLE IF NOT EXISTS user_progress (
         user_id Int32,
         movie_id Int32,
@@ -14,9 +14,10 @@ create_table_query = '''
     ) ENGINE = MergeTree()
     PARTITION BY toYYYYMMDD(timestamp)
     ORDER BY (user_id, movie_id, timestamp)
-'''
+"""
 
 client.execute(create_table_query)
+
 
 def generate_entries(start_index, end_index, user_id, movie_id, current_timestamp):
     entries = []
@@ -26,6 +27,7 @@ def generate_entries(start_index, end_index, user_id, movie_id, current_timestam
         entry = (user_id, movie_id, progress, timestamp)
         entries.append(entry)
     return entries
+
 
 user_id = 1
 movie_id = 123
@@ -37,15 +39,29 @@ batches = total_entries // batch_size
 
 with concurrent.futures.ThreadPoolExecutor() as executor:
     futures = []
-    for batch in tqdm(range(batches), desc='Generating Batches', unit='batch'):
+    for batch in tqdm(range(batches), desc="Generating Batches", unit="batch"):
         start_index = batch * batch_size
         end_index = start_index + batch_size
-        future = executor.submit(generate_entries, start_index, end_index, user_id, movie_id, current_timestamp)
+        future = executor.submit(
+            generate_entries,
+            start_index,
+            end_index,
+            user_id,
+            movie_id,
+            current_timestamp,
+        )
         futures.append(future)
 
-    for future in tqdm(concurrent.futures.as_completed(futures), desc='Inserting Batches', total=batches, unit='batch'):
+    for future in tqdm(
+        concurrent.futures.as_completed(futures),
+        desc="Inserting Batches",
+        total=batches,
+        unit="batch",
+    ):
         entries = future.result()
-        insert_query = 'INSERT INTO user_progress (user_id, movie_id, progress, timestamp) VALUES'
+        insert_query = (
+            "INSERT INTO user_progress (user_id, movie_id, progress, timestamp) VALUES"
+        )
         client.execute(insert_query, entries, types_check=True)
 
 client.disconnect()

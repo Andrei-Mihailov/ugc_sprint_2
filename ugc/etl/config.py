@@ -51,6 +51,6 @@ class Kafka:
     def __init__(self) -> None:
         self.kafka_connect: Union[KafkaConsumer, None]
 
- 
+
 ch = Clickhouse()
 kafka = Kafka()

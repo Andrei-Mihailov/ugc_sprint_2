@@ -1,4 +1,5 @@
-from ugc.api.src.main import db
+from main import db
+
 
 class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)

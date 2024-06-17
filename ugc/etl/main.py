@@ -31,7 +31,7 @@ def init_db():
             if i < len(attr_name) - 1:
                 attr_str = attr_str + ","
 
-        query =  f"""
+        query = f"""
             CREATE TABLE IF NOT EXISTS {settings.CH_DATABASE}.{item_dt}
                 (
                     {attr_str}
@@ -45,12 +45,12 @@ def init_db():
 
 def load_data_to_clickhouse(batch):
     for message in batch:
-        message_key_str = message.key.decode("utf-8") 
+        message_key_str = message.key.decode("utf-8")
         payload = message.value
         payload_required = event_mappings[message_key_str][0]
         payload_required_types = event_mappings[message_key_str][1]
         checked = True
-        
+
         for item in payload_required:
             if not item in payload.keys():
                 checked = False
@@ -58,34 +58,40 @@ def load_data_to_clickhouse(batch):
 
         if checked:
             data_tuple = ()
-            for i in range(len(payload_required)): 
+            for i in range(len(payload_required)):
                 if payload_required_types[i] == "DateTime":
                     try:
-                        date_column = datetime.strptime(payload[payload_required[i]], "%Y-%m-%d %H:%M:%S")
-                        data_tuple += (date_column, )
+                        date_column = datetime.strptime(
+                            payload[payload_required[i]], "%Y-%m-%d %H:%M:%S"
+                        )
+                        data_tuple += (date_column,)
                     except:
-                        logger.error(f"Error when trying parse date {payload[payload_required[i]]}")
+                        logger.error(
+                            f"Error when trying parse date {payload[payload_required[i]]}"
+                        )
                 else:
-                    data_tuple += (payload[payload_required[i]], )
+                    data_tuple += (payload[payload_required[i]],)
 
             exists_data = collect_dict[message_key_str]
             exists_data.append(data_tuple)
             collect_dict[message_key_str] = exists_data
-    
+
     for message_key_str, exists_data in collect_dict.items():
-        payload_required = event_mappings[message_key_str][0]                         
+        payload_required = event_mappings[message_key_str][0]
         try:
-            query = f"INSERT INTO {message_key_str} ({','.join(payload_required)}) VALUES"
-            ch.clickhouse_connect.execute(query,
-                                          exists_data
+            query = (
+                f"INSERT INTO {message_key_str} ({','.join(payload_required)}) VALUES"
             )
+            ch.clickhouse_connect.execute(query, exists_data)
             collect_dict[message_key_str] = []
         except Exception as e:
             logger.error(f"Error when trying to write Clickhouse: {str(e)}")
-            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=str(e))  
+            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=str(e))
 
 
-@on_exception(expo, (KafkaConnectionError, NoBrokersAvailable), max_tries=settings.MAX_TRIES)
+@on_exception(
+    expo, (KafkaConnectionError, NoBrokersAvailable), max_tries=settings.MAX_TRIES
+)
 def etl():
     batch = []
     for message in kafka.kafka_connect:
@@ -100,21 +106,25 @@ def etl():
                 batch = []
 
 
-@on_exception(expo, (KafkaConnectionError, NoBrokersAvailable, ConnectionError), max_tries=settings.MAX_TRIES)
+@on_exception(
+    expo,
+    (KafkaConnectionError, NoBrokersAvailable, ConnectionError),
+    max_tries=settings.MAX_TRIES,
+)
 def get_connections():
     ch.clickhouse_connect = Client(
-                                    host=settings.CH_HOST,
-                                    database=settings.CH_DATABASE,
-                                    user=settings.CH_USER,
-                                    password=settings.CH_PASSWORD
+        host=settings.CH_HOST,
+        database=settings.CH_DATABASE,
+        user=settings.CH_USER,
+        password=settings.CH_PASSWORD,
     )
     kafka.kafka_connect = KafkaConsumer(
-                                    settings.KAFKA_TOPIC,
-                                    group_id=settings.KAFKA_GROUP,
-                                    bootstrap_servers=[f"{settings.KAFKA_HOST}:{settings.KAFKA_PORT}"],
-                                    auto_offset_reset="earliest",
-                                    value_deserializer=kafka_json_deserializer,
-                                    enable_auto_commit=False,
+        settings.KAFKA_TOPIC,
+        group_id=settings.KAFKA_GROUP,
+        bootstrap_servers=[f"{settings.KAFKA_HOST}:{settings.KAFKA_PORT}"],
+        auto_offset_reset="earliest",
+        value_deserializer=kafka_json_deserializer,
+        enable_auto_commit=False,
     )
 
 
