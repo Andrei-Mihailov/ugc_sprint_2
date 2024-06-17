@@ -1,31 +1,18 @@
-from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request, jsonify, Blueprint
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
-from flask_restful import Resource, Api
+from ugc.api.src.main import app, db
+from ugc.api.src.models.review import Review
 
-app = Flask(__name__)
-api = Api(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///reviews.db'
-db = SQLAlchemy(app)
 
-jwt = JWTManager(app)
-
-
-class Review(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    movie_id = db.Column(db.String(128), nullable=False)
-    user_id = db.Column(db.String(128), nullable=False)
-    review = db.Column(db.String(1024), nullable=False)
-
-    def __repr__(self):
-        return f"<Review movie_id={self.movie_id}, user_id={self.user_id}, review={self.review}>"
-
+ugc_blueprint = Blueprint("ugc", __name__, url_prefix="/ugc")
 
 db.create_all()
 
 
-@jwt_required()
+@ugc_blueprint.route("/api/v1/<movie_id>/review",
+                     methods=["GET", "POST"])
 def add_review(movie_id):
     user_id = get_jwt_identity()
     review = request.get_json()
@@ -35,13 +22,14 @@ def add_review(movie_id):
     return '', 200
 
 
-@jwt_required()
+@ugc_blueprint.route("/api/v1/<movie_id>/review",
+                     methods=["GET", "POST"])
 def retrieve_reviews(movie_id):
     reviews = Review.query.filter_by(movie_id=movie_id).all()
     return jsonify([review.to_dict() for review in reviews]), 200
 
-
-@jwt_required()
+@ugc_blueprint.route("/api/v1/<movie_id>/review",
+                     methods=["GET", "POST"])
 def delete_review(movie_id):
     user_id = get_jwt_identity()
     review = request.get_json()
@@ -52,9 +40,5 @@ def delete_review(movie_id):
     return '', 200
 
 
-api.add_resource(add_review, '/api/v1/<movie_id>/review')
-api.add_resource(retrieve_reviews, '/api/v1/<movie_id>/review')
-api.add_resource(delete_review, '/api/v1/<movie_id>/review')
 
-if __name__ == '__main__':
-    app.run(debug=True)
+

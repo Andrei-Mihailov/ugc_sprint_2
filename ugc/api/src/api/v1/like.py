@@ -1,32 +1,22 @@
-from flask import Flask, request
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request, Blueprint
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
-from flask_restful import Resource, Api
+from ugc.api.src.main import app, db
+from ugc.api.src.models.like import Like
 
-app = Flask(__name__)
-api = Api(app)
+
+
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///likes.db'
-db = SQLAlchemy(app)
-
-jwt = JWTManager(app)
 
 
-class Like(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    movie_id = db.Column(db.String(128), nullable=False)
-    user_id = db.Column(db.String(128), nullable=False)
-    like = db.Column(db.Integer, default=0)
-    dislike = db.Column(db.Integer, default=0)
 
-    def __repr__(self):
-        return f"<Like movie_id={self.movie_id}, user_id={self.user_id}, like={self.like}, dislike={self.dislike}>"
-
+ugc_blueprint = Blueprint("ugc", __name__, url_prefix="/ugc")
 
 db.create_all()
 
 
-@jwt_required()
+@ugc_blueprint.route("/api/v1/<movie_id>/like",
+                     methods=["GET", "POST"])
 def add_like(movie_id):
     user_id = get_jwt_identity()
     like = Like.query.filter_by(movie_id=movie_id, user_id=user_id).first()
@@ -40,7 +30,8 @@ def add_like(movie_id):
     return '', 200
 
 
-@jwt_required()
+@ugc_blueprint.route("/api/v1/<movie_id>/dislike",
+                     methods=["GET", "POST"])
 def add_dislike(movie_id):
     user_id = get_jwt_identity()
     like = Like.query.filter_by(movie_id=movie_id, user_id=user_id).first()
@@ -52,8 +43,4 @@ def add_dislike(movie_id):
         like.dislike += 1
         db.session.commit()
     return '', 200
-
-
-api.add_resource(add_like, '/api/v1/<movie_id>/like')
-api.add_resource(add_dislike, '/api/v1/<movie_id>/dislike')
 

@@ -3,12 +3,16 @@ from kafka3.admin import KafkaAdminClient, NewTopic
 from kafka3.errors import KafkaConnectionError
 from backoff import on_exception, expo
 from flask_jwt_extended import JWTManager
+from flask_restful import Resource, Api
+from flask_sqlalchemy import SQLAlchemy
 
 from api.v1.kafka_producer import ugc_blueprint
 from config import settings
 
 
 app = Flask(__name__)
+api = Api(app)
+db = SQLAlchemy(app)
 app.config["JWT_SECRET_KEY"] = settings.JWT_SECRET_KEY
 jwt = JWTManager(app)
 
