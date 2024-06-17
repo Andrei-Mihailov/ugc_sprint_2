@@ -73,4 +73,4 @@ Flask был выбран чтобы иметь его в арсенале на 
 
 # ссылка на репозиторий:
 
-https://github.com/Andrei-Mihailov/ugc_sprint_1
+https://github.com/Andrei-Mihailov/ugc_sprint_2
