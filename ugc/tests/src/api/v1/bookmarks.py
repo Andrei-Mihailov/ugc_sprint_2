@@ -1,3 +1,4 @@
+import sys
 from unittest.mock import patch
 
 import pytest
@@ -5,6 +6,8 @@ from flask import Flask
 from flask_jwt_extended import create_access_token
 
 from ugc.api.src.main import blueprint
+
+sys.path.append('/path/to/flask/application/directory')
 
 
 @pytest.fixture
