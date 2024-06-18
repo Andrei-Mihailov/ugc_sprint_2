@@ -8,7 +8,7 @@ from models.review import Review
 
 from ugc.api.src.main import db, ugc_blueprint
 
-sys.path.append('/path/to/flask/application/directory')
+sys.path.append("/path/to/flask/application/directory")
 
 
 @pytest.fixture

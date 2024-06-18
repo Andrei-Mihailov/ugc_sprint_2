@@ -8,7 +8,7 @@ from models.like import Like
 
 from ugc.api.src.main import db, ugc_blueprint
 
-sys.path.append('/path/to/flask/application/directory')
+sys.path.append("/path/to/flask/application/directory")
 
 
 @pytest.fixture

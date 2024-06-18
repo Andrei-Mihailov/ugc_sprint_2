@@ -7,7 +7,7 @@ from flask_jwt_extended import create_access_token
 
 from ugc.api.src.main import blueprint
 
-sys.path.append('/path/to/flask/application/directory')
+sys.path.append("/path/to/flask/application/directory")
 
 
 @pytest.fixture
