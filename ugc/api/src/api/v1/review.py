@@ -16,12 +16,19 @@ db.create_all()
 @jwt_required
 def add_review(movie_id):
     user_id = get_jwt_identity()
-    review = request.get_json()
-    review = Review(movie_id=movie_id, user_id=user_id, **review)
-    db.session.add(review)
-    db.session.commit()
-    capture_message(f"User {user_id} added review for movie {movie_id}")
-    return "", 200
+
+    if request.method == "POST":
+        review_data = request.get_json()
+        review = Review(movie_id=movie_id, user_id=user_id, **review_data)
+        db.session.add(review)
+        db.session.commit()
+        capture_message(f"User {user_id} added review for movie {movie_id}")
+        return "", 200
+
+    elif request.method == "GET":
+        reviews = Review.query.filter_by(movie_id=movie_id).all()
+        reviews_list = [review.to_dict() for review in reviews]
+        return jsonify(reviews_list), 200
 
 
 @ugc_blueprint.route("/api/v1/<int:movie_id>/reviews", methods=["GET"])
@@ -36,13 +43,30 @@ def retrieve_reviews(movie_id):
 @jwt_required
 def delete_review(movie_id):
     user_id = get_jwt_identity()
-    review = request.get_json()
-    review = Review.query.filter_by(movie_id=movie_id, user_id=user_id, **review).first()
-    if review is not None:
-        db.session.delete(review)
+
+    if request.method == "POST":
+        review_data = request.get_json()
+        review = Review(movie_id=movie_id, user_id=user_id, **review_data)
+        db.session.add(review)
         db.session.commit()
-        capture_message(f"User {user_id} deleted review for movie {movie_id}")
+        capture_message(f"User {user_id} added review for movie {movie_id}")
         return "", 200
-    else:
-        capture_message(f"Review not found for user {user_id} and movie {movie_id}")
-        return jsonify({"error": "Review not found"}), 404
+
+    elif request.method == "GET":
+        reviews = Review.query.filter_by(movie_id=movie_id).all()
+        reviews_list = [
+            review.to_dict() for review in reviews
+        ]  # Assuming you have a to_dict method in your Review model
+        return jsonify(reviews_list), 200
+
+    elif request.method == "DELETE":
+        review_data = request.get_json()
+        review = Review.query.filter_by(movie_id=movie_id, user_id=user_id, **review_data).first()
+        if review is not None:
+            db.session.delete(review)
+            db.session.commit()
+            capture_message(f"User {user_id} deleted review for movie {movie_id}")
+            return "", 200
+        else:
+            capture_message(f"Review not found for user {user_id} and movie {movie_id}")
+            return jsonify({"error": "Review not found"}), 404

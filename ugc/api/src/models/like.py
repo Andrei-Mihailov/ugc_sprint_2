@@ -5,6 +5,7 @@ class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     movie_id = db.Column(db.String(128), nullable=False)
     user_id = db.Column(db.String(128), nullable=False)
+    is_like = db.Column(db.Boolean, nullable=False)
     like = db.Column(db.Integer, default=0)
     dislike = db.Column(db.Integer, default=0)
 
