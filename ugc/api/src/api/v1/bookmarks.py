@@ -1,9 +1,8 @@
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask import Blueprint, jsonify
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from sentry_sdk import capture_message
+from services import get_bookmark_service
 from werkzeug.exceptions import NotFound
-
-from core import security_jwt_remote
-from services import BookmarkService, get_bookmark_service
 
 blueprint = Blueprint("bookmark", __name__, url_prefix="/api/v1")
 
@@ -15,6 +14,7 @@ def add_bookmark(movie_id: int):
 
     bookmark_service = get_bookmark_service()
     bookmark_service.create({"movie_id": movie_id, "user_id": user_id})
+    capture_message(f"Bookmark has been added successfully for user {user_id} and movie {movie_id}")
 
     return jsonify({"success": True}), 200
 
@@ -28,8 +28,10 @@ def delete_bookmark(movie_id: int):
     bookmark = bookmark_service.get_by_movie_id_and_user_id(movie_id, user_id)
 
     if not bookmark:
+        capture_message(f"Bookmark not found for user {user_id} and movie {movie_id}")
         raise NotFound(description="Bookmark not found")
 
     bookmark_service.delete(bookmark)
 
+    capture_message(f"Bookmark has been deleted successfully for user {user_id} and movie {movie_id}")
     return (jsonify({"success": True}),)

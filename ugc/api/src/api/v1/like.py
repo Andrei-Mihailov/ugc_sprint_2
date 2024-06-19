@@ -1,8 +1,9 @@
-from flask import Flask, request, Blueprint
-from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
-from ugc.api.src.main import app, db
+from flask import Blueprint
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from models.like import Like
+from sentry_sdk import capture_message
 
+from ugc.api.src.main import app, db
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///likes.db"
 
@@ -21,9 +22,11 @@ def add_like(movie_id):
         like = Like(movie_id=movie_id, user_id=user_id)
         db.session.add(like)
         db.session.commit()
+        capture_message(f"User {user_id} liked movie {movie_id} for the first time")
     else:
         like.like += 1
         db.session.commit()
+        capture_message(f"User {user_id} liked movie {movie_id} again")
     return "", 200
 
 
@@ -36,7 +39,9 @@ def add_dislike(movie_id):
         like = Like(movie_id=movie_id, user_id=user_id)
         db.session.add(like)
         db.session.commit()
+        capture_message(f"User {user_id} disliked movie {movie_id} for the first time")
     else:
         like.dislike += 1
         db.session.commit()
+        capture_message(f"User {user_id} disliked movie {movie_id} again")
     return "", 200

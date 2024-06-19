@@ -8,22 +8,23 @@ services:
     environment:
       - WORKERS=1
       - PORT_APP=5000
+      - SENTRY_DSN=<https://7e322a912461958b85dcdf23716aeff5@o4507457845592064.ingest.de.sentry.io/4507457848016976>
     depends_on:
       - kafka
     ports:
       - "5000:5000"
-  
+
   ugc-etl:
     build:
       context: .
       dockerfile: Dockerfile-ugc-etl
     container_name: ugc-etl
     depends_on:
-      kafka: 
+      kafka:
         condition: service_started
       clickhouse:
         condition: service_healthy
-  
+
   kafka:
     image: bitnami/kafka:3.7
     container_name: ugc-kafka
@@ -51,7 +52,7 @@ services:
       interval: 5s
       timeout: 10s
       retries: 10
-  
+
   kafka-ui:
     image: provectuslabs/kafka-ui:v0.7.2
     container_name: ugc-kafka-ui
@@ -62,7 +63,7 @@ services:
     environment:
       - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka:9092
       - KAFKA_CLUSTERS_0_NAME=kraft
-  
+
   clickhouse:
     image: clickhouse/clickhouse-server:23.8
     container_name: ugc-clickhouse
@@ -87,9 +88,9 @@ services:
     container_name: dbeaver
     ports:
       - '8978:8978'
-    volumes: 
-      - cloudbeaver:/opt/cloudbeaver/workspace 
-  
+    volumes:
+      - cloudbeaver:/opt/cloudbeaver/workspace
+
 volumes:
   kafka_data:
   clickhouse_data:
