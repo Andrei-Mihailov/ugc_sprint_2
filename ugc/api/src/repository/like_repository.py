@@ -1,6 +1,5 @@
+from models.like import Like
 from sqlalchemy.orm import Session
-
-from ugc.api.src.models.like import Like
 
 
 class LikeSQLAlchemyRepository:

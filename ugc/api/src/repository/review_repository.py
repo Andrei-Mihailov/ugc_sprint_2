@@ -1,6 +1,5 @@
+from models.review import Review
 from sqlalchemy.orm import Session
-
-from ugc.api.src.models.review import Review
 
 
 class ReviewSQLAlchemyRepository:

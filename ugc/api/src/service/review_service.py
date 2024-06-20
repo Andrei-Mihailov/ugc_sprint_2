@@ -1,6 +1,5 @@
+from repository.review_repository import ReviewSQLAlchemyRepository
 from sqlalchemy.orm import Session
-
-from ugc.api.src.repository.review_repository import ReviewSQLAlchemyRepository
 
 
 class ReviewService(ReviewSQLAlchemyRepository):

@@ -1,6 +1,5 @@
+from repository.like_repository import LikeSQLAlchemyRepository
 from sqlalchemy.orm import Session
-
-from ugc.api.src.repository.like_repository import LikeSQLAlchemyRepository
 
 
 class LikeService(LikeSQLAlchemyRepository):

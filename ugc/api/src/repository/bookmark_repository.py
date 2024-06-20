@@ -1,6 +1,5 @@
+from models.bookmark import Bookmark
 from sqlalchemy.orm import Session
-
-from ugc.api.src.models.bookmark import Bookmark
 
 
 class BookmarkSQLAlchemyRepository:
