@@ -1,6 +1,6 @@
 import logging
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 
 
@@ -29,3 +29,20 @@ settings = Settings()
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
+
+
+class PostgreSQLConfig(BaseModel):
+    dbname: str
+    user: str
+    password: str
+    host: str
+    port: int
+
+
+pg_config_data = PostgreSQLConfig(
+    dbname=settings.db_name,
+    user=settings.db_user,
+    password=settings.db_password,
+    host=settings.db_host,
+    port=settings.db_port,
+)

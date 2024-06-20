@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from sentry_sdk import capture_message
-from services import get_bookmark_service
+from service.bookmark_service import get_bookmark_service
 from werkzeug.exceptions import NotFound
 
 blueprint = Blueprint("bookmark", __name__, url_prefix="/api/v1")

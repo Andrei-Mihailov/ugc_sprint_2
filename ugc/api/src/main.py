@@ -1,7 +1,7 @@
 import sentry_sdk
 from api.v1.kafka_producer import ugc_blueprint
 from backoff import expo, on_exception
-from config import settings
+from config import pg_config_data, settings
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
@@ -11,7 +11,16 @@ from kafka3.errors import KafkaConnectionError
 
 app = Flask(__name__)
 api = Api(app)
+
+
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    f"postgresql+asyncpg://{pg_config_data.user}:{pg_config_data.password}@{pg_config_data.host}:"
+    f"{pg_config_data.port}/{pg_config_data.dbname}"
+)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
+
 app.config["JWT_SECRET_KEY"] = settings.JWT_SECRET_KEY
 jwt = JWTManager(app)
 
