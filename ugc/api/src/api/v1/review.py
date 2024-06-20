@@ -3,13 +3,9 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from models.review import Review
 from sentry_sdk import capture_message
 
-from ugc.api.src.main import app, db
-
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///reviews.db"
+from ugc.api.src.main import db
 
 ugc_blueprint = Blueprint("ugc", __name__, url_prefix="/ugc")
-
-db.create_all()
 
 
 @ugc_blueprint.route("/api/v1/<movie_id>/review", methods=["GET", "POST"])
@@ -54,9 +50,7 @@ def delete_review(movie_id):
 
     elif request.method == "GET":
         reviews = Review.query.filter_by(movie_id=movie_id).all()
-        reviews_list = [
-            review.to_dict() for review in reviews
-        ]  # Assuming you have a to_dict method in your Review model
+        reviews_list = [review.to_dict() for review in reviews]
         return jsonify(reviews_list), 200
 
     elif request.method == "DELETE":
