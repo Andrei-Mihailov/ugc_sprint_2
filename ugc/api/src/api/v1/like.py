@@ -4,13 +4,9 @@ from models.like import Like
 from models.movie import Movie
 from sentry_sdk import capture_message
 
-from ugc.api.src.main import app, db
-
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///likes.db"
+from ugc.api.src.main import db
 
 ugc_blueprint = Blueprint("ugc", __name__, url_prefix="/ugc")
-
-db.create_all()
 
 
 @ugc_blueprint.route("/api/v1/<movie_id>/like", methods=["POST"])

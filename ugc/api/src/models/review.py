@@ -2,6 +2,7 @@ from main import db
 
 
 class Review(db.Model):
+    __tablename__ = "reviews"
     id = db.Column(db.Integer, primary_key=True)
     movie_id = db.Column(db.String(128), nullable=False)
     user_id = db.Column(db.String(128), nullable=False)
