@@ -1,14 +1,14 @@
 import sys
+from http import HTTPStatus
 from unittest.mock import patch
 
 import pytest
 from flask import Flask
 from flask_jwt_extended import create_access_token
-from http import HTTPStatus
+from main import db, ugc_blueprint
+from models.like import Like
 
 sys.path.append("ugc/api/src/")
-from main import ugc_blueprint
-from models.like import Like
 
 
 @pytest.fixture
