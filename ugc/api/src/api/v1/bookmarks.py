@@ -3,6 +3,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from sentry_sdk import capture_message
 from service.bookmark_service import get_bookmark_service
 from werkzeug.exceptions import NotFound
+from http import HTTPStatus
 
 blueprint = Blueprint("bookmark", __name__, url_prefix="/api/v1")
 
@@ -16,7 +17,7 @@ def add_bookmark(movie_id: int):
     bookmark_service.create({"movie_id": movie_id, "user_id": user_id})
     capture_message(f"Bookmark has been added successfully for user {user_id} and movie {movie_id}")
 
-    return jsonify({"success": True}), 200
+    return jsonify({"success": True}), HTTPStatus.OK
 
 
 @blueprint.route("/<movie_id>/bookmark", methods=["DELETE"])
@@ -34,4 +35,4 @@ def delete_bookmark(movie_id: int):
     bookmark_service.delete(bookmark)
 
     capture_message(f"Bookmark has been deleted successfully for user {user_id} and movie {movie_id}")
-    return (jsonify({"success": True}),)
+    return jsonify({"success": True}), HTTPStatus.OK

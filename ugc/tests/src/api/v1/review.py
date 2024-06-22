@@ -4,11 +4,11 @@ from unittest.mock import patch
 import pytest
 from flask import Flask
 from flask_jwt_extended import create_access_token
+from http import HTTPStatus
+
+sys.path.append("ugc/api/src/")
+from main import db, ugc_blueprint
 from models.review import Review
-
-from ugc.api.src.main import db, ugc_blueprint
-
-sys.path.append("/path/to/flask/application/directory")
 
 
 @pytest.fixture
@@ -47,7 +47,7 @@ def test_add_review(mock_session, client, access_token):
         headers={"Authorization": f"Bearer {access_token}"},
     )
 
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert mock_session.add.called
     assert mock_session.commit.called
 
@@ -61,7 +61,7 @@ def test_retrieve_reviews(mock_query, client, access_token):
 
     response = client.get("/ugc/api/v1/123/review", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json == [{"movie_id": 123, "user_id": 1, "content": "Great movie!", "rating": 5}]
 
 
@@ -79,6 +79,6 @@ def test_delete_review(mock_session, mock_query, client, access_token):
         headers={"Authorization": f"Bearer {access_token}"},
     )
 
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert mock_session.delete.called
     assert mock_session.commit.called

@@ -4,11 +4,11 @@ from unittest.mock import patch
 import pytest
 from flask import Flask
 from flask_jwt_extended import create_access_token
+from http import HTTPStatus
+
+sys.path.append("ugc/api/src/")
+from main import ugc_blueprint
 from models.like import Like
-
-from ugc.api.src.main import db, ugc_blueprint
-
-sys.path.append("/path/to/flask/application/directory")
 
 
 @pytest.fixture
@@ -44,7 +44,7 @@ def test_add_like(mock_session, mock_query, client, access_token):
 
     response = client.post("/ugc/api/v1/123/like", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert mock_session.add.called
     assert mock_session.commit.called
 
@@ -56,7 +56,7 @@ def test_add_dislike(mock_session, mock_query, client, access_token):
 
     response = client.post("/ugc/api/v1/123/dislike", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert mock_session.add.called
     assert mock_session.commit.called
 
@@ -70,7 +70,7 @@ def test_increment_like(mock_session, mock_query, client, access_token):
 
     response = client.post("/ugc/api/v1/123/like", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert mock_like.like == 2
     assert mock_session.commit.called
 
@@ -83,6 +83,6 @@ def test_increment_dislike(mock_session, mock_query, client, access_token):
 
     response = client.post("/ugc/api/v1/123/dislike", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert mock_like.dislike == 2
     assert mock_session.commit.called

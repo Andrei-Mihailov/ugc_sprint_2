@@ -4,16 +4,16 @@ from unittest.mock import patch
 import pytest
 from flask import Flask
 from flask_jwt_extended import create_access_token
+from http import HTTPStatus
 
-from ugc.api.src.main import blueprint
-
-sys.path.append("/path/to/flask/application/directory")
+sys.path.append("ugc/api/src/")
+from main import ugc_blueprint
 
 
 @pytest.fixture
 def app():
     app = Flask(__name__)
-    app.register_blueprint(blueprint)
+    app.register_blueprint(ugc_blueprint)
     app.config["JWT_SECRET_KEY"] = "test_secret"
     return app
 
@@ -29,19 +29,19 @@ def access_token(app):
         return create_access_token(identity=1)
 
 
-@patch("your_module.get_bookmark_service")
+@patch("service.bookmark_service.get_bookmark_service")
 def test_add_bookmark(mock_get_bookmark_service, client, access_token):
     mock_service = mock_get_bookmark_service.return_value
     mock_service.create.return_value = None
 
     response = client.post("/api/v1/123/bookmark", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json == {"success": True}
     mock_service.create.assert_called_once_with({"movie_id": 123, "user_id": 1})
 
 
-@patch("your_module.get_bookmark_service")
+@patch("service.bookmark_service.get_bookmark_service")
 def test_delete_bookmark_success(mock_get_bookmark_service, client, access_token):
     mock_service = mock_get_bookmark_service.return_value
     mock_service.get_by_movie_id_and_user_id.return_value = {
@@ -53,17 +53,17 @@ def test_delete_bookmark_success(mock_get_bookmark_service, client, access_token
 
     response = client.delete("/api/v1/123/bookmark", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json == {"success": True}
     mock_service.delete.assert_called_once_with({"id": 1, "movie_id": 123, "user_id": 1})
 
 
-@patch("your_module.get_bookmark_service")
+@patch("service.bookmark_service.get_bookmark_service")
 def test_delete_bookmark_not_found(mock_get_bookmark_service, client, access_token):
     mock_service = mock_get_bookmark_service.return_value
     mock_service.get_by_movie_id_and_user_id.return_value = None
 
     response = client.delete("/api/v1/123/bookmark", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 404
+    assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json == {"message": "Bookmark not found"}
